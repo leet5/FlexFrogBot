@@ -42,3 +42,7 @@ func GetUserName(update *api.Update) (string, error) {
 	}
 	return "", errors.New("username not found in update")
 }
+
+func isImage(mime string) bool {
+	return mime == "image/jpeg" || mime == "image/png" || mime == "image/gif" || mime == "image/webp"
+}

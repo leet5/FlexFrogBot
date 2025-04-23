@@ -26,5 +26,15 @@ func isBotAddedToGroup(update *api.Update) bool {
 }
 
 func hasImage(update *api.Update) bool {
-	return update.Message != nil && len(update.Message.Photo) > 0
+	if update.Message == nil {
+		return false
+	}
+	if update.Message.Document != nil && isImage(update.Message.Document.MimeType) {
+		return true
+	}
+	return len(update.Message.Photo) > 0
+}
+
+func isImage(mime string) bool {
+	return mime == "image/jpeg" || mime == "image/png" || mime == "image/gif" || mime == "image/webp"
 }

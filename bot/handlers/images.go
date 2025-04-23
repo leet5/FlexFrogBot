@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	api "mini-app-back/tg-bot-api"
 )
@@ -18,9 +19,18 @@ func HandleImage(update *api.Update, groups map[int64]bool) {
 		return
 	}
 
-	photo := update.Message.Photo
-	largest := photo[len(photo)-1]
-	fileID := largest.FileID
+	switch {
+	case len(update.Message.Photo) > 0:
+		photo := update.Message.Photo
+		largest := photo[len(photo)-1]
+		fileID := largest.FileID
+		filename := fmt.Sprintf("%d_photo.jpg", update.Message.MessageID)
+		api.DownloadFile(saveDir, fileID, filename)
 
-	api.DownloadFile(update, saveDir, fileID)
+	case update.Message.Document != nil && isImage(update.Message.Document.MimeType):
+		doc := update.Message.Document
+		fileID := doc.FileID
+		filename := fmt.Sprintf("%d_%s", update.Message.MessageID, doc.FileName)
+		api.DownloadFile(saveDir, fileID, filename)
+	}
 }

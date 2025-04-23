@@ -13,6 +13,13 @@ type Message struct {
 	NewChatMembers *[]User     `json:"new_chat_members,omitempty"`
 	Photo          []PhotoSize `json:"photo,omitempty"`
 	From           *User       `json:"from,omitempty"`
+	Document       *Document   `json:"document,omitempty"`
+}
+
+type Document struct {
+	FileID   string `json:"file_id"`
+	FileName string `json:"file_name"`
+	MimeType string `json:"mime_type"`
 }
 
 type PhotoSize struct {

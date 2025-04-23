@@ -107,7 +107,7 @@ func SendTextMessage(chatID int64, text string) error {
 }
 
 // DownloadFile downloads a file from telegram servers
-func DownloadFile(update *Update, saveDir string, fileID string) {
+func DownloadFile(saveDir, fileID, filename string) {
 	fileInfo, err := getFileInfo(fileID)
 	if err != nil {
 		log.Printf("[photo] ❌ Failed to get file path: %v", err)
@@ -115,7 +115,6 @@ func DownloadFile(update *Update, saveDir string, fileID string) {
 	}
 
 	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", token, fileInfo.FilePath)
-	filename := fmt.Sprintf("%d_%s.jpg", update.Message.MessageID, fileID[:10])
 	dest := filepath.Join(saveDir, filename)
 
 	err = downloadFile(fileURL, dest)
