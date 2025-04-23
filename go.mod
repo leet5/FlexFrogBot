@@ -1,3 +1,3 @@
-module mini-app-back
+module flex-frog-bot
 
 go 1.24
