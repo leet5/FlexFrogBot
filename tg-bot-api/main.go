@@ -1,6 +1,9 @@
 package tg_bot_api
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 var (
 	token string
@@ -8,4 +11,7 @@ var (
 
 func init() {
 	token = os.Getenv("BOT_TOKEN")
+	if token == "" {
+		log.Fatalln("BOT_TOKEN env variable not set")
+	}
 }
