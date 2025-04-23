@@ -12,6 +12,7 @@ type Message struct {
 	Chat           Chat        `json:"chat"`
 	NewChatMembers *[]User     `json:"new_chat_members,omitempty"`
 	Photo          []PhotoSize `json:"photo,omitempty"`
+	From           *User       `json:"from,omitempty"`
 }
 
 type PhotoSize struct {
@@ -37,6 +38,7 @@ type CallbackQuery struct {
 	ID      string   `json:"id"`
 	Data    string   `json:"data"`
 	Message *Message `json:"message"`
+	From    *User    `json:"from,omitempty"`
 }
 
 type GetUpdatesResponse struct {

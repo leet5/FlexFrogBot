@@ -10,7 +10,8 @@ const (
 )
 
 var (
-	groups = make(map[int64]bool)
+	groups     = make(map[int64]bool)
+	userGroups = make(map[int64]map[int64]struct{})
 )
 
 func ProcessUpdates(updates <-chan *api.Update) {

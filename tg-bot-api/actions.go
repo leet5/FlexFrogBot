@@ -191,3 +191,39 @@ func decodeUpdates(body io.ReadCloser) (*GetUpdatesResponse, error) {
 
 	return &result, nil
 }
+
+// IsUserAdmin checks whether is user with this ID is Administrator of chat with chatID
+func IsUserAdmin(chatID, userID int64) (bool, error) {
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/getChatAdministrators?chat_id=%d", token, chatID)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return false, fmt.Errorf("http.Get: %w", err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("[tg_bot_api] Failed to close response body: %v", err)
+		}
+	}(resp.Body)
+
+	var result struct {
+		OK     bool `json:"ok"`
+		Result []struct {
+			User struct {
+				ID int64 `json:"id"`
+			} `json:"user"`
+		} `json:"result"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return false, fmt.Errorf("json.Decode: %w", err)
+	}
+
+	for _, admin := range result.Result {
+		if admin.User.ID == userID {
+			return true, nil
+		}
+	}
+	return false, nil
+}

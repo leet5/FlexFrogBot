@@ -15,7 +15,7 @@ func HandleStop(update *api.Update, groups map[int64]bool) {
 	groups[chatID] = false
 	log.Printf("[bot] ⛔ Stop button pressed in chat_id=%d. Bot deactivated.", chatID)
 
-	err = api.SendTextMessage(chatID, "⛔ Bot has been deactivated. Send /start to reactivate it.")
+	err = api.SendTextMessage(chatID, "⛔ Bot has been deactivated.")
 	if err != nil {
 		log.Printf("[bot] ❌ Failed to send stop confirmation: %v", err)
 	}
