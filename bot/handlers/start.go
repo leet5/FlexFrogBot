@@ -1,0 +1,22 @@
+package handlers
+
+import (
+	"log"
+	api "mini-app-back/tg-bot-api"
+)
+
+func HandleStart(update *api.Update, groups map[int64]bool) {
+	chatID, err := GetChatID(update)
+	if err != nil {
+		log.Printf("[bot] ❌ Failed to extract chat ID: %v", err)
+		return
+	}
+
+	groups[chatID] = true
+	log.Printf("[bot] ✅ Start button pressed in chat_id=%d. Bot activated.", chatID)
+
+	err = api.SendTextMessage(chatID, "✅ Bot is now active and ready to process images!")
+	if err != nil {
+		log.Printf("[bot] ❌ Failed to send start confirmation: %v", err)
+	}
+}
