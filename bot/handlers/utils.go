@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"errors"
-	api "mini-app-back/tg-bot-api"
+	api "flex-frog-bot/tg-bot-api"
 )
 
 func GetChatID(update *api.Update) (int64, error) {

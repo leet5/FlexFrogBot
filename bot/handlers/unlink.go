@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	api "flex-frog-bot/tg-bot-api"
 	"log"
-	api "mini-app-back/tg-bot-api"
 )
 
 // HandleUnlink removes the specified group from the user's "watched" groups

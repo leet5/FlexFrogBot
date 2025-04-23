@@ -1,9 +1,9 @@
 package bot
 
 import (
+	"flex-frog-bot/bot/handlers"
+	api "flex-frog-bot/tg-bot-api"
 	"log"
-	"mini-app-back/bot/handlers"
-	api "mini-app-back/tg-bot-api"
 )
 
 func handleCallback(update *api.Update) {

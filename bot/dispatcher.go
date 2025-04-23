@@ -1,8 +1,8 @@
 package bot
 
 import (
-	"mini-app-back/bot/handlers"
-	api "mini-app-back/tg-bot-api"
+	"flex-frog-bot/bot/handlers"
+	api "flex-frog-bot/tg-bot-api"
 )
 
 const (

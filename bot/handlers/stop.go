@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	api "flex-frog-bot/tg-bot-api"
 	"log"
-	api "mini-app-back/tg-bot-api"
 )
 
 func HandleStop(update *api.Update, chats map[int64]bool) {

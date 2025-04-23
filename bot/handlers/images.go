@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	api "flex-frog-bot/tg-bot-api"
 	"fmt"
 	"log"
-	api "mini-app-back/tg-bot-api"
 )
 
 const saveDir = "./images"

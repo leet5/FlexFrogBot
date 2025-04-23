@@ -1,7 +1,7 @@
 package bot
 
 import (
-	api "mini-app-back/tg-bot-api"
+	api "flex-frog-bot/tg-bot-api"
 	"strings"
 )
 

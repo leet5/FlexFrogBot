@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	api "flex-frog-bot/tg-bot-api"
 	"fmt"
 	"log"
-	api "mini-app-back/tg-bot-api"
 )
 
 // HandleLink appends the specified group to the user's "watched" groups
@@ -34,6 +34,7 @@ func HandleLink(update *api.Update, groups map[int64]bool, userGroups map[int64]
 		if err != nil {
 			log.Printf("[bot] ❌ Failed to send link message: %v", err)
 		}
+		return
 	}
 
 	userGroups[userID][chatID] = struct{}{}

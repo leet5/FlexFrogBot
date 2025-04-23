@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	api "flex-frog-bot/tg-bot-api"
 	"log"
-	api "mini-app-back/tg-bot-api"
 )
 
 func HandleNewChat(update *api.Update) {
