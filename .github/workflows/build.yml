@@ -1,4 +1,4 @@
-name: Go Telegram FlexFrog CI
+name: FlexFrog Telegram Bot CI
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: 🐳 Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/flexFrog:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/flex-frog-bot:latest .
 
       - name: 🚀 Push to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/flexFrog:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/flex-frog-bot:latest
