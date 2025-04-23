@@ -5,14 +5,14 @@ import (
 	api "mini-app-back/tg-bot-api"
 )
 
-func HandleStop(update *api.Update, groups map[int64]bool) {
+func HandleStop(update *api.Update, chats map[int64]bool) {
 	chatID, err := GetChatID(update)
 	if err != nil {
 		log.Printf("[bot] ❌ Failed to extract chat ID: %v", err)
 		return
 	}
 
-	groups[chatID] = false
+	chats[chatID] = false
 	log.Printf("[bot] ⛔ Stop button pressed in chat_id=%d. Bot deactivated.", chatID)
 
 	err = api.SendTextMessage(chatID, "⛔ Bot has been deactivated.")

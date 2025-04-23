@@ -6,7 +6,7 @@ import (
 )
 
 // HandleUnlink removes the specified group from the user's "watched" groups
-func HandleUnlink(update *api.Update, userGroups map[int64]map[int64]struct{}) {
+func HandleUnlink(update *api.Update, userChats map[int64]map[int64]struct{}) {
 	chatID, err := GetChatID(update)
 	if err != nil {
 		log.Printf("[bot] ❌ Failed to extract chat ID: %v", err)
@@ -20,7 +20,7 @@ func HandleUnlink(update *api.Update, userGroups map[int64]map[int64]struct{}) {
 	}
 
 	// Check if the user has any linked groups
-	if groups, ok := userGroups[userID]; ok {
+	if groups, ok := userChats[userID]; ok {
 		// Remove the group if it exists
 		if _, exists := groups[chatID]; exists {
 			delete(groups, chatID)

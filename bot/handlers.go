@@ -9,13 +9,13 @@ import (
 func handleCallback(update *api.Update) {
 	switch update.Callback.Data {
 	case "/start":
-		handlers.HandleStart(update, groups)
+		handlers.HandleStart(update, chats)
 	case "/stop":
-		handlers.HandleStop(update, groups)
+		handlers.HandleStop(update, chats)
 	case "/link":
-		handlers.HandleLink(update, userGroups) // TODO if bot is stopped in chat but user trying to link?
+		handlers.HandleLink(update, chats, userChats)
 	case "/unlink":
-		handlers.HandleUnlink(update, userGroups)
+		handlers.HandleUnlink(update, userChats)
 	default:
 		log.Printf("[bot] Unknown callback: %s", update.Callback.Data)
 	}
@@ -25,11 +25,11 @@ func handleCommand(update *api.Update) {
 	cmd := update.Message.Text
 	switch cmd {
 	case "/menu":
-		handlers.HandleMenu(update, groups, userGroups)
+		handlers.HandleMenu(update, chats, userChats)
 	case "/start":
-		handlers.HandleStart(update, groups)
+		handlers.HandleStart(update, chats)
 	case "/stop":
-		handlers.HandleStop(update, groups)
+		handlers.HandleStop(update, chats)
 	default:
 		log.Printf("Unknown command: %s", cmd)
 		err := api.SendTextMessage(update.Message.Chat.ID, "❓ Unknown command. Try /menu")

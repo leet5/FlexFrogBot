@@ -5,7 +5,7 @@ import (
 	api "mini-app-back/tg-bot-api"
 )
 
-func HandleMenu(update *api.Update, groups map[int64]bool, userGroups map[int64]map[int64]struct{}) {
+func HandleMenu(update *api.Update, chats map[int64]bool, userChats map[int64]map[int64]struct{}) {
 	chatID, err := GetChatID(update)
 	if err != nil {
 		log.Printf("[bot] ❌ Failed to get chat ID: %v", err)
@@ -27,18 +27,18 @@ func HandleMenu(update *api.Update, groups map[int64]bool, userGroups map[int64]
 	}
 
 	if isAdmin {
-		if groups[chatID] {
+		if chats[chatID] {
 			buttons = append(buttons, []api.InlineKeyboardButton{{Text: "⏹️ Stop", CallbackData: "/stop"}})
 		} else {
 			buttons = append(buttons, []api.InlineKeyboardButton{{Text: "▶️ Start", CallbackData: "/start"}})
 		}
 	}
 
-	if userGroups[userID] == nil {
-		userGroups[userID] = make(map[int64]struct{})
+	if userChats[userID] == nil {
+		userChats[userID] = make(map[int64]struct{})
 	}
 
-	if _, ok := userGroups[userID][chatID]; !ok {
+	if _, ok := userChats[userID][chatID]; !ok {
 		buttons = append(buttons, []api.InlineKeyboardButton{{Text: "⏺️ Add to watches", CallbackData: "/link"}})
 	} else {
 		buttons = append(buttons, []api.InlineKeyboardButton{{Text: "↩️ Remove from watches", CallbackData: "/unlink"}})

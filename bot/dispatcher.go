@@ -10,8 +10,8 @@ const (
 )
 
 var (
-	groups     = make(map[int64]bool)
-	userGroups = make(map[int64]map[int64]struct{})
+	chats     = make(map[int64]bool)
+	userChats = make(map[int64]map[int64]struct{})
 )
 
 func ProcessUpdates(updates <-chan *api.Update) {
@@ -27,7 +27,7 @@ func ProcessUpdates(updates <-chan *api.Update) {
 			handleCommand(update)
 
 		case hasImage(update):
-			handlers.HandleImage(update, groups)
+			handlers.HandleImage(update, chats)
 		}
 	}
 
