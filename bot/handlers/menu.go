@@ -49,7 +49,7 @@ func HandleMenu(update *api.Update, chats map[int64]bool, userChats map[int64]ma
 			{
 				Text: "🧩 Open Mini App",
 				WebApp: &api.WebApp{
-					URL: "https://your-mini-app-url.com",
+					URL: "https://flex-frog.ddns.net",
 				},
 			},
 		})
