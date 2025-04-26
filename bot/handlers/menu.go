@@ -1,19 +1,21 @@
 package handlers
 
 import (
+	"context"
+	"flex-frog-bot/db/repository"
 	api "flex-frog-bot/tg-bot-api"
 	"log"
 )
 
-func HandleMenu(update *api.Update, chats map[int64]bool, userChats map[int64]map[int64]struct{}) {
+func HandleMenu(ctx context.Context, update *api.Update, chatRepo *repository.ChatRepository) {
 	chatID, err := GetChatID(update)
 	if err != nil {
-		log.Printf("[bot] ❌ Failed to get chat ID: %v", err)
+		log.Printf("[bot][handle_menu] ❌ Failed to get chat ID: %v", err)
 		return
 	}
 	userID, err := GetUserID(update)
 	if err != nil {
-		log.Printf("[bot] ❌ Failed to get user ID: %v", err)
+		log.Printf("[bot][handle_menu] ❌ Failed to get user ID: %v", err)
 		return
 	}
 
@@ -22,26 +24,21 @@ func HandleMenu(update *api.Update, chats map[int64]bool, userChats map[int64]ma
 
 	isAdmin, err := api.IsUserAdmin(chatID, userID)
 	if err != nil {
-		log.Printf("[bot] Failed to check user admin rights: %v", err)
+		log.Printf("[bot][handle_menu] Failed to check user admin rights: %v", err)
 		return
 	}
 
 	if isAdmin {
-		if chats[chatID] {
+		watched, err := chatRepo.CheckIfChatWatched(ctx, chatID)
+		if err != nil {
+			log.Printf("[bot][handle_menu] ❌ Failed to check if chat is watched: %v", err)
+			return
+		}
+		if watched {
 			buttons = append(buttons, []api.InlineKeyboardButton{{Text: "⏹️ Stop", CallbackData: "/stop"}})
 		} else {
 			buttons = append(buttons, []api.InlineKeyboardButton{{Text: "▶️ Start", CallbackData: "/start"}})
 		}
-	}
-
-	if userChats[userID] == nil {
-		userChats[userID] = make(map[int64]struct{})
-	}
-
-	if _, ok := userChats[userID][chatID]; !ok {
-		buttons = append(buttons, []api.InlineKeyboardButton{{Text: "⏺️ Add to watches", CallbackData: "/link"}})
-	} else {
-		buttons = append(buttons, []api.InlineKeyboardButton{{Text: "↩️ Remove from watches", CallbackData: "/unlink"}})
 	}
 
 	if isPrivate {
@@ -64,8 +61,8 @@ func HandleMenu(update *api.Update, chats map[int64]bool, userChats map[int64]ma
 	})
 
 	if err != nil {
-		log.Printf("[bot] ❌ Failed to send menu: %v", err)
+		log.Printf("[bot][handle_menu] ❌ Failed to send menu: %v", err)
 	} else {
-		log.Printf("[bot] 📋 Sent menu to chat_id=%d", chatID)
+		log.Printf("[bot][handle_menu] 📋 Sent menu to chat_id=%d", chatID)
 	}
 }

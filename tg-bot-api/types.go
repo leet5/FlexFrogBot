@@ -1,9 +1,10 @@
 package tg_bot_api
 
 type Update struct {
-	UpdateID int            `json:"update_id"`
-	Message  *Message       `json:"message,omitempty"`
-	Callback *CallbackQuery `json:"callback_query,omitempty"`
+	UpdateID     int               `json:"update_id"`
+	Message      *Message          `json:"message,omitempty"`
+	Callback     *CallbackQuery    `json:"callback_query,omitempty"`
+	MyChatMember *ChatMemberUpdate `json:"my_chat_member,omitempty"`
 }
 
 type Message struct {
@@ -37,8 +38,9 @@ type User struct {
 }
 
 type Chat struct {
-	ID   int64  `json:"id"`
-	Type string `json:"type"`
+	ID    int64  `json:"id"`
+	Type  string `json:"type"`
+	Title string `json:"title,omitempty"`
 }
 
 type CallbackQuery struct {
@@ -75,4 +77,17 @@ type WebApp struct {
 
 type FileInfo struct {
 	FilePath string `json:"file_path"`
+}
+
+type ChatMemberUpdate struct {
+	Chat          Chat            `json:"chat"`
+	From          *User           `json:"from"`
+	Date          int64           `json:"date"`
+	OldChatMember *ChatMemberInfo `json:"old_chat_member"`
+	NewChatMember *ChatMemberInfo `json:"new_chat_member"`
+}
+
+type ChatMemberInfo struct {
+	User   *User  `json:"user"`
+	Status string `json:"status"`
 }

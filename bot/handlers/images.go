@@ -1,36 +1,91 @@
 package handlers
 
 import (
+	"context"
+	"flex-frog-bot/db/repository"
 	api "flex-frog-bot/tg-bot-api"
 	"fmt"
 	"log"
+	"os"
 )
 
 const saveDir = "./images"
 
-func HandleImage(update *api.Update, groups map[int64]bool) {
+// HandleImage processes an incoming image or image-document from a Telegram update,
+// saves it to disk, inserts it into the DB, and deletes the file afterward.
+func HandleImage(ctx context.Context, update *api.Update, imageRepo *repository.ImageRepository, chatRepo *repository.ChatRepository) {
 	chatID, err := GetChatID(update)
 	if err != nil {
-		log.Printf("[images] ❌ Failed to extract chat ID: %v", err)
+		log.Printf("[bot][images] ❌ Unable to extract chat ID: %v", err)
+		return
+	}
+	watched, err := chatRepo.CheckIfChatWatched(ctx, chatID)
+	if err != nil {
+		log.Printf("[bot][images] ❌ Unable to check if chat is watched: %v", err)
+		return
+	}
+	if !watched {
 		return
 	}
 
-	if !groups[chatID] {
+	messageID, err := GetMessageID(update)
+	if err != nil {
+		log.Printf("[bot][images] ❌ Unable to extract message ID: %v", err)
 		return
+	}
+
+	dest, err := downloadImageFromUpdate(update)
+	if err != nil {
+		log.Printf("[bot][images] ❌ %v", err)
+		return
+	}
+
+	if err := storeImage(ctx, dest, messageID, imageRepo); err != nil {
+		log.Printf("[bot][images] ❌ %v", err)
+	} else {
+		log.Printf("[bot][images] ✅ Stored image from message %d and deleted %s", messageID, dest)
+	}
+}
+
+func downloadImageFromUpdate(update *api.Update) (string, error) {
+	if update.Message == nil {
+		return "", fmt.Errorf("no message content found")
 	}
 
 	switch {
 	case len(update.Message.Photo) > 0:
-		photo := update.Message.Photo
-		largest := photo[len(photo)-1]
-		fileID := largest.FileID
+		largest := update.Message.Photo[len(update.Message.Photo)-1]
 		filename := fmt.Sprintf("%d_photo.jpg", update.Message.MessageID)
-		api.DownloadFile(saveDir, fileID, filename)
+		return api.DownloadFile(saveDir, largest.FileID, filename)
 
 	case update.Message.Document != nil && isImage(update.Message.Document.MimeType):
 		doc := update.Message.Document
-		fileID := doc.FileID
 		filename := fmt.Sprintf("%d_%s", update.Message.MessageID, doc.FileName)
-		api.DownloadFile(saveDir, fileID, filename)
+		return api.DownloadFile(saveDir, doc.FileID, filename)
+
+	default:
+		return "", fmt.Errorf("no valid image found in message")
 	}
+}
+
+func storeImage(ctx context.Context, filepath string, messageID int64, imageRepo *repository.ImageRepository) error {
+	data, err := os.ReadFile(filepath)
+	if err != nil {
+		return fmt.Errorf("failed to read image file %s: %w", filepath, err)
+	}
+
+	_, err = imageRepo.InsertImage(ctx, &repository.Image{
+		ImageName: filepath,
+		ImageData: data,
+		MessageID: messageID,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to insert image into DB: %w", err)
+	}
+
+	if err := os.Remove(filepath); err != nil {
+		return fmt.Errorf("failed to delete image file %s: %w", filepath, err)
+	}
+
+	return nil
 }

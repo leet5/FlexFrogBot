@@ -38,3 +38,11 @@ func hasImage(update *api.Update) bool {
 func isImage(mime string) bool {
 	return mime == "image/jpeg" || mime == "image/png" || mime == "image/gif" || mime == "image/webp"
 }
+
+func isBotRemovedFromChat(update *api.Update) bool {
+	if update.MyChatMember == nil {
+		return false
+	}
+	return update.MyChatMember.NewChatMember.User.Username == botName &&
+		update.MyChatMember.NewChatMember.Status == "left"
+}

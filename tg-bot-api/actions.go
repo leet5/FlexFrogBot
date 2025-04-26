@@ -107,11 +107,11 @@ func SendTextMessage(chatID int64, text string) error {
 }
 
 // DownloadFile downloads a file from telegram servers
-func DownloadFile(saveDir, fileID, filename string) {
+func DownloadFile(saveDir, fileID, filename string) (string, error) {
 	fileInfo, err := getFileInfo(fileID)
 	if err != nil {
 		log.Printf("[photo] ❌ Failed to get file path: %v", err)
-		return
+		return "", err
 	}
 
 	fileURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", token, fileInfo.FilePath)
@@ -120,10 +120,11 @@ func DownloadFile(saveDir, fileID, filename string) {
 	err = downloadFile(fileURL, dest)
 	if err != nil {
 		log.Printf("[tg_bot_api] ❌ Failed to download file: %v", err)
-		return
+		return "", err
 	}
 
 	log.Printf("[tg_bot_api] ✅ Saved file to %s", dest)
+	return dest, nil
 }
 
 // getFileInfo gets file information from telegram servers by it ID
