@@ -8,9 +8,10 @@ import (
 )
 
 type Chat struct {
-	ID       int64  `db:"id"`
-	ChatName string `db:"chat_name"`
-	Watched  bool   `db:"watched"`
+	ID        int64  `db:"id"`
+	ChatName  string `db:"chat_name"`
+	Thumbnail []byte `db:"thumbnail"`
+	Watched   bool   `db:"watched"`
 }
 
 type ChatRepository struct {
@@ -40,14 +41,14 @@ func (r *ChatRepository) GetChatByID(ctx context.Context, chatID int64) (*Chat, 
 }
 
 // InsertChat inserts a new chat into the database.
-func (r *ChatRepository) InsertChat(ctx context.Context, chatID int64, chatName string, watched bool) error {
+func (r *ChatRepository) InsertChat(ctx context.Context, chatID int64, chatName string, thumbnail []byte, watched bool) error {
 	var id int64
 	query := `
-		INSERT INTO chats (id, chat_name, watched)
-		VALUES ($1, $2, $3)
+		INSERT INTO chats (id, chat_name, thumbnail, watched)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
-	if err := r.DB.QueryRowContext(ctx, query, chatID, chatName, watched).Scan(&id); err != nil {
+	if err := r.DB.QueryRowContext(ctx, query, chatID, chatName, thumbnail, watched).Scan(&id); err != nil {
 		return err
 	}
 	return nil

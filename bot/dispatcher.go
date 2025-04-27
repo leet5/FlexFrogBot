@@ -13,9 +13,9 @@ const (
 )
 
 var (
-	ImageRepo *repository.ImageRepository
-	ChatRepo  *repository.ChatRepository
-	UserRepo  *repository.UserRepository
+	ImgRepo  *repository.ImageRepository
+	ChatRepo *repository.ChatRepository
+	UserRepo *repository.UserRepository
 )
 
 func ProcessUpdates(ctx context.Context, updates <-chan *api.Update) {
@@ -25,7 +25,7 @@ func ProcessUpdates(ctx context.Context, updates <-chan *api.Update) {
 			handlers.HandleBotRemoved(ctx, update, ChatRepo)
 
 		case isBotAddedToGroup(update):
-			handlers.HandleNewChat(update)
+			handlers.HandleNewChat(ctx, update, ChatRepo)
 
 		case isCallbackQuery(update):
 			handleCallback(ctx, update)
@@ -34,7 +34,7 @@ func ProcessUpdates(ctx context.Context, updates <-chan *api.Update) {
 			handleCommand(ctx, update)
 
 		case hasImage(update):
-			handlers.HandleImage(ctx, update, ImageRepo, ChatRepo)
+			handlers.HandleImage(ctx, update, ImgRepo, ChatRepo)
 		}
 
 		checkNewUser(ctx, update)
@@ -44,7 +44,6 @@ func ProcessUpdates(ctx context.Context, updates <-chan *api.Update) {
 func checkNewUser(ctx context.Context, update *api.Update) {
 	userID, err := handlers.GetUserID(update)
 	if err != nil {
-		log.Printf("[bot][check_new_user] ⚠️ Error getting user ID: %v", err)
 		return
 	}
 

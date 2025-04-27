@@ -13,25 +13,27 @@ func handleCallback(ctx context.Context, update *api.Update) {
 		handlers.HandleStart(ctx, update, ChatRepo)
 	case "/stop":
 		handlers.HandleStop(ctx, update, ChatRepo)
+	case "/webapp":
+		handlers.HandleWebApp(update)
 	default:
-		log.Printf("[bot] Unknown callback: %s", update.Callback.Data)
+		log.Printf("[bot][handle_callback] ⚠️ Unknown callback: %s", update.Callback.Data)
 	}
 }
 
 func handleCommand(ctx context.Context, update *api.Update) {
 	cmd := update.Message.Text
 	switch cmd {
-	case "/menu":
-		handlers.HandleMenu(ctx, update, ChatRepo)
 	case "/start":
 		handlers.HandleStart(ctx, update, ChatRepo)
 	case "/stop":
 		handlers.HandleStop(ctx, update, ChatRepo)
+	case "/webapp":
+		handlers.HandleWebApp(update)
 	default:
-		log.Printf("Unknown command: %s", cmd)
-		err := api.SendTextMessage(update.Message.Chat.ID, "❓ Unknown command. Try /menu")
+		log.Printf("[bot][handle_command] ⚠️ Unknown command: %s", cmd)
+		err := api.SendTextMessage(update.Message.Chat.ID, "❓ Unknown command. Try /start /stop")
 		if err != nil {
-			log.Printf("Error sending fallback message: %v", err)
+			log.Printf("[bot][handle_command] ⚠️ Error sending fallback message: %v", err)
 		}
 	}
 }

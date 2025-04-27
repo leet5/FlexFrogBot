@@ -22,14 +22,14 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 // InsertUser inserts a new user into the database.
-func (r *UserRepository) InsertUser(ctx context.Context, userID int64, username string) (int64, error) {
+func (r *UserRepository) InsertUser(ctx context.Context, userID int64, username string, thumbnail []byte) (int64, error) {
 	var id int64
 	query := `
-		INSERT INTO users (id, username)
-		VALUES ($1, $2)
+		INSERT INTO users (id, username, thumbnail)
+		VALUES ($1, $2, $3)
 		RETURNING id
 	`
-	err := r.DB.QueryRowContext(ctx, query, userID, username).Scan(&id)
+	err := r.DB.QueryRowContext(ctx, query, userID, username, thumbnail).Scan(&id)
 	return id, err
 }
 

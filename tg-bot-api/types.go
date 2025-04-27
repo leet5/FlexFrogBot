@@ -57,7 +57,7 @@ type GetUpdatesResponse struct {
 
 type InlineKeyboardButton struct {
 	Text         string  `json:"text"`
-	CallbackData string  `json:"callback_data"`
+	CallbackData string  `json:"callback_data,omitempty"`
 	WebApp       *WebApp `json:"web_app,omitempty"`
 }
 
@@ -66,9 +66,9 @@ type InlineKeyboardMarkup struct {
 }
 
 type MessagePayload struct {
-	ChatID      int64                `json:"chat_id"`
-	Text        string               `json:"text"`
-	ReplyMarkup InlineKeyboardMarkup `json:"reply_markup"`
+	ChatID      int64                 `json:"chat_id"`
+	Text        string                `json:"text"`
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup"`
 }
 
 type WebApp struct {
@@ -90,4 +90,23 @@ type ChatMemberUpdate struct {
 type ChatMemberInfo struct {
 	User   *User  `json:"user"`
 	Status string `json:"status"`
+}
+
+type UserProfilePhotos struct {
+	OK     bool `json:"ok"`
+	Result struct {
+		TotalCount int           `json:"total_count,omitempty"` // omit if 0
+		Photos     [][]PhotoSize `json:"photos,omitempty"`      // omit if nil or empty
+	} `json:"result"`
+}
+
+type ChatProfilePhoto struct {
+	OK     bool `json:"ok"`
+	Result struct {
+		Photo *ChatPhoto `json:"photo,omitempty"` // pointer + omitempty
+	} `json:"result"`
+}
+
+type ChatPhoto struct {
+	BigFileID string `json:"big_file_id,omitempty"` // omit if empty
 }
