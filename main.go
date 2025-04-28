@@ -3,20 +3,16 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"flex-frog-bot/bot"
 	"flex-frog-bot/db"
 	"flex-frog-bot/db/repository"
 	"flex-frog-bot/server"
-	tgbotapi "flex-frog-bot/tg-bot-api"
 	_ "fmt"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 )
 
 func main() {
@@ -42,11 +38,11 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		runBot(ctx, imgRepo, chatRepo, userRepo)
+		bot.RunBot(ctx, imgRepo, chatRepo, userRepo)
 	}()
 	go func() {
 		defer wg.Done()
-		runServer(ctx, imgRepo)
+		server.RunServer(ctx, imgRepo)
 	}()
 
 	wg.Wait()
@@ -66,40 +62,4 @@ func initRepositories(conn *sql.DB) (*repository.ImageRepository, *repository.Ch
 	chatRepo := repository.NewChatRepository(conn)
 	userRepo := repository.NewUserRepository(conn)
 	return imgRepo, chatRepo, userRepo
-}
-
-func runBot(ctx context.Context, imgRepo *repository.ImageRepository, chatRepo *repository.ChatRepository, userRepo *repository.UserRepository) {
-	bot.ImgRepo = imgRepo
-	bot.ChatRepo = chatRepo
-	bot.UserRepo = userRepo
-
-	updates := tgbotapi.GetUpdatesChan()
-	bot.ProcessUpdates(ctx, updates)
-}
-
-func runServer(ctx context.Context, imgRepo *repository.ImageRepository) {
-	server.ImgRepo = imgRepo
-
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: http.DefaultServeMux,
-	}
-
-	http.HandleFunc("/api/v1/search", server.WithCORS(server.HandleSearch))
-
-	go func() {
-		log.Println("[server] ✅ Starting server on :8080 ...")
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("[server] ⚠️ Error starting server: %v", err)
-		}
-	}()
-
-	<-ctx.Done()
-
-	log.Println("[server] ⚠️ Shutting down server...")
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Printf("[server] ❌ Error during server shutdown: %v", err)
-	}
 }

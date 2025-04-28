@@ -3,22 +3,11 @@ package bot
 import (
 	"context"
 	"flex-frog-bot/bot/handlers"
-	"flex-frog-bot/db/repository"
 	api "flex-frog-bot/tg-bot-api"
 	"log"
 )
 
-const (
-	botName = "img_srch_bot"
-)
-
-var (
-	ImgRepo  *repository.ImageRepository
-	ChatRepo *repository.ChatRepository
-	UserRepo *repository.UserRepository
-)
-
-func ProcessUpdates(ctx context.Context, updates <-chan *api.Update) {
+func processUpdates(ctx context.Context, updates <-chan *api.Update) {
 	for update := range updates {
 		switch {
 		case isBotRemovedFromChat(update):

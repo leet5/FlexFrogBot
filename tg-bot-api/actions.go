@@ -17,7 +17,7 @@ func GetUpdatesChan() <-chan *Update {
 
 	go func() {
 		var lastUpdateID int
-		log.Println("[tg_bot_api] Starting long polling...")
+		log.Println("[tg_bot_api] 🕑 Starting long polling...")
 
 		for {
 			resp, err := fetchUpdates(lastUpdateID + 1)

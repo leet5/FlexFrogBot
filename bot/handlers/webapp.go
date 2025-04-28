@@ -21,7 +21,7 @@ func HandleWebApp(update *api.Update) {
 	button := api.InlineKeyboardButton{
 		Text: "🧩 Open Mini App",
 		WebApp: &api.WebApp{
-			URL: fmt.Sprintf("https://flexfrog.ddns.net?user_id=%d&chat_id=%d", userID, chatID),
+			URL: fmt.Sprintf("https://flexfrog.ddns.net?user_id=%d", userID),
 		},
 	}
 
