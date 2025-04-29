@@ -25,20 +25,6 @@ func isBotAddedToGroup(update *api.Update) bool {
 	return false
 }
 
-func hasImage(update *api.Update) bool {
-	if update.Message == nil {
-		return false
-	}
-	if update.Message.Document != nil && isImage(update.Message.Document.MimeType) {
-		return true
-	}
-	return len(update.Message.Photo) > 0
-}
-
-func isImage(mime string) bool {
-	return mime == "image/jpeg" || mime == "image/png" || mime == "image/gif" || mime == "image/webp"
-}
-
 func isBotRemovedFromChat(update *api.Update) bool {
 	if update.MyChatMember == nil {
 		return false

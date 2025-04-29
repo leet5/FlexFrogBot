@@ -11,10 +11,10 @@ func processUpdates(ctx context.Context, updates <-chan *api.Update) {
 	for update := range updates {
 		switch {
 		case isBotRemovedFromChat(update):
-			handlers.HandleBotRemoved(ctx, update, ChatRepo)
+			handlers.HandleBotRemoved(ctx, update, ChatService)
 
 		case isBotAddedToGroup(update):
-			handlers.HandleNewChat(ctx, update, ChatRepo)
+			handlers.HandleNewChat(ctx, update, ChatService)
 
 		case isCallbackQuery(update):
 			handleCallback(ctx, update)
@@ -22,8 +22,8 @@ func processUpdates(ctx context.Context, updates <-chan *api.Update) {
 		case isCommand(update):
 			handleCommand(ctx, update)
 
-		case hasImage(update):
-			handlers.HandleImage(ctx, update, ImgRepo, ChatRepo)
+		case ImageService.HasImage(update):
+			handlers.HandleImage(ctx, update, ImageService, ChatService, UserService)
 		}
 
 		checkNewUser(ctx, update)
@@ -31,17 +31,17 @@ func processUpdates(ctx context.Context, updates <-chan *api.Update) {
 }
 
 func checkNewUser(ctx context.Context, update *api.Update) {
-	userID, err := handlers.GetUserID(update)
+	userID, err := UserService.GetUserID(update)
 	if err != nil {
 		return
 	}
 
-	user, err := UserRepo.GetUserByID(ctx, userID)
+	user, err := UserService.GetByID(ctx, userID)
 	if err != nil {
 		log.Printf("[bot][check_new_user] ⚠️ Error getting user from database: %v", err)
 	}
 
 	if user == nil {
-		handlers.HandleNewUser(ctx, update, UserRepo)
+		handlers.HandleNewUser(ctx, update, UserService, ChatService)
 	}
 }

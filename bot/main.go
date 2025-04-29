@@ -2,7 +2,7 @@ package bot
 
 import (
 	"context"
-	"flex-frog-bot/db/repository"
+	interfaces2 "flex-frog-bot/services/interfaces"
 	tgbotapi "flex-frog-bot/tg-bot-api"
 )
 
@@ -11,15 +11,15 @@ const (
 )
 
 var (
-	ImgRepo  *repository.ImageRepository
-	ChatRepo *repository.ChatRepository
-	UserRepo *repository.UserRepository
+	ImageService interfaces2.ImageService
+	ChatService  interfaces2.ChatService
+	UserService  interfaces2.UserService
 )
 
-func RunBot(ctx context.Context, imgRepo *repository.ImageRepository, chatRepo *repository.ChatRepository, userRepo *repository.UserRepository) {
-	ImgRepo = imgRepo
-	ChatRepo = chatRepo
-	UserRepo = userRepo
+func RunBot(ctx context.Context, imgService interfaces2.ImageService, chatService interfaces2.ChatService, userService interfaces2.UserService) {
+	ImageService = imgService
+	ChatService = chatService
+	UserService = userService
 
 	updates := tgbotapi.GetUpdatesChan()
 	processUpdates(ctx, updates)

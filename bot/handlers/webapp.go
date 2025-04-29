@@ -1,18 +1,19 @@
 package handlers
 
 import (
+	interfaces2 "flex-frog-bot/services/interfaces"
 	api "flex-frog-bot/tg-bot-api"
 	"fmt"
 	"log"
 )
 
-func HandleWebApp(update *api.Update) {
-	chatID, err := GetChatID(update)
+func HandleWebApp(update *api.Update, chtSvc interfaces2.ChatService, usrSvc interfaces2.UserService) {
+	chatID, err := chtSvc.GetChatID(update)
 	if err != nil {
 		log.Printf("[bot][handle_webapp] ⚠️ Error getting chat ID: %v", err)
 		return
 	}
-	userID, err := GetUserID(update)
+	userID, err := usrSvc.GetUserID(update)
 	if err != nil {
 		log.Printf("[bot][handle_webapp] ⚠️ Error getting user ID: %v", err)
 		return

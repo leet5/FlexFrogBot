@@ -2,26 +2,26 @@ package handlers
 
 import (
 	"context"
-	"flex-frog-bot/db/repository"
+	"flex-frog-bot/services/interfaces"
 	api "flex-frog-bot/tg-bot-api"
 	"log"
 )
 
-func HandleStop(ctx context.Context, update *api.Update, chatRepo *repository.ChatRepository) {
-	chatID, err := GetChatID(update)
+func HandleStop(ctx context.Context, update *api.Update, chtSvc interfaces.ChatService) {
+	chatID, err := chtSvc.GetChatID(update)
 	if err != nil {
 		log.Printf("[bot][handle_stop] ❌ Failed to extract chat ID: %v", err)
 		return
 	}
 
-	watched, err := chatRepo.CheckIfChatWatched(ctx, chatID)
+	watched, err := chtSvc.IsWatched(ctx, chatID)
 	if err != nil {
 		log.Printf("[bot][handle_stop] ❌ Failed to check if chat is already watched: %v", err)
 		return
 	}
 
 	if watched {
-		if err := chatRepo.UnwatchChat(ctx, chatID); err != nil {
+		if err := chtSvc.Unwatch(ctx, chatID); err != nil {
 			log.Printf("[bot][handle_stop] ❌ Failed to unwatch chat '%d': %v", chatID, err)
 			return
 		}

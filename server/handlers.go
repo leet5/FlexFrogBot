@@ -25,7 +25,7 @@ func HandleSearch(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Get images by tags from repository
-	images, err := ImgRepo.GetImagesByTags(context.Background(), tags)
+	images, err := SearchService.GetImagesByTags(context.Background(), tags)
 	if err != nil {
 		log.Printf("[server][search] ❌ Failed to get images: %v", err)
 		http.Error(res, "Internal server error", http.StatusInternalServerError)

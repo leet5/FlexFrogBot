@@ -10,11 +10,11 @@ import (
 func handleCallback(ctx context.Context, update *api.Update) {
 	switch update.Callback.Data {
 	case "/start":
-		handlers.HandleStart(ctx, update, ChatRepo)
+		handlers.HandleStart(ctx, update, ChatService)
 	case "/stop":
-		handlers.HandleStop(ctx, update, ChatRepo)
+		handlers.HandleStop(ctx, update, ChatService)
 	case "/webapp":
-		handlers.HandleWebApp(update)
+		handlers.HandleWebApp(update, ChatService, UserService)
 	default:
 		log.Printf("[bot][handle_callback] ⚠️ Unknown callback: %s", update.Callback.Data)
 	}
@@ -24,11 +24,11 @@ func handleCommand(ctx context.Context, update *api.Update) {
 	cmd := update.Message.Text
 	switch cmd {
 	case "/start":
-		handlers.HandleStart(ctx, update, ChatRepo)
+		handlers.HandleStart(ctx, update, ChatService)
 	case "/stop":
-		handlers.HandleStop(ctx, update, ChatRepo)
+		handlers.HandleStop(ctx, update, ChatService)
 	case "/webapp":
-		handlers.HandleWebApp(update)
+		handlers.HandleWebApp(update, ChatService, UserService)
 	default:
 		log.Printf("[bot][handle_command] ⚠️ Unknown command: %s", cmd)
 		err := api.SendTextMessage(update.Message.Chat.ID, "❓ Unknown command. Try /start /stop")

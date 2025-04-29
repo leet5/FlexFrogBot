@@ -3,18 +3,18 @@ package server
 import (
 	"context"
 	"errors"
-	"flex-frog-bot/db/repository"
+	"flex-frog-bot/services/interfaces"
 	"log"
 	"net/http"
 	"time"
 )
 
 var (
-	ImgRepo *repository.ImageRepository
+	SearchService interfaces.SearchService
 )
 
-func RunServer(ctx context.Context, imgRepo *repository.ImageRepository) {
-	ImgRepo = imgRepo
+func RunServer(ctx context.Context, searchService interfaces.SearchService) {
+	SearchService = searchService
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/search", WithCORS(HandleSearch))

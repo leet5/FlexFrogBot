@@ -5,8 +5,11 @@ import (
 	"database/sql"
 	"flex-frog-bot/bot"
 	"flex-frog-bot/db"
-	"flex-frog-bot/db/repository"
+	"flex-frog-bot/db/repositories"
+	repos "flex-frog-bot/db/repositories/interfaces"
 	"flex-frog-bot/server"
+	services2 "flex-frog-bot/services"
+	"flex-frog-bot/services/interfaces"
 	_ "fmt"
 	"log"
 	"os"
@@ -31,18 +34,19 @@ func main() {
 
 	go handleShutdown(cancel)
 
-	imgRepo, chatRepo, userRepo := initRepositories(conn)
+	imgRepo, chatRepo, userRepo, searchRepo := initRepositories(conn)
+	imgSvc, chatSvc, userSvc, searchSvc := initServices(imgRepo, chatRepo, userRepo, searchRepo)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		bot.RunBot(ctx, imgRepo, chatRepo, userRepo)
+		bot.RunBot(ctx, imgSvc, chatSvc, userSvc)
 	}()
 	go func() {
 		defer wg.Done()
-		server.RunServer(ctx, imgRepo)
+		server.RunServer(ctx, searchSvc)
 	}()
 
 	wg.Wait()
@@ -57,9 +61,18 @@ func handleShutdown(cancel context.CancelFunc) {
 	cancel()
 }
 
-func initRepositories(conn *sql.DB) (*repository.ImageRepository, *repository.ChatRepository, *repository.UserRepository) {
-	imgRepo := repository.NewImageRepository(conn)
-	chatRepo := repository.NewChatRepository(conn)
-	userRepo := repository.NewUserRepository(conn)
-	return imgRepo, chatRepo, userRepo
+func initRepositories(conn *sql.DB) (repos.ImageRepository, repos.ChatRepository, repos.UserRepository, repos.SearchRepository) {
+	imgRepo := repositories.NewImageRepository(conn)
+	chatRepo := repositories.NewChatRepository(conn)
+	userRepo := repositories.NewUserRepository(conn)
+	searchRepo := repositories.NewSearchRepository(conn)
+	return imgRepo, chatRepo, userRepo, searchRepo
+}
+
+func initServices(imgRepo repos.ImageRepository, chatRepo repos.ChatRepository, userRepo repos.UserRepository, searchRepo repos.SearchRepository) (interfaces.ImageService, interfaces.ChatService, interfaces.UserService, interfaces.SearchService) {
+	imgSvc := services2.NewImageService(imgRepo)
+	chatSvc := services2.NewChatService(chatRepo)
+	userSvc := services2.NewUserService(userRepo)
+	searchSvc := services2.NewSearchService(searchRepo)
+	return imgSvc, chatSvc, userSvc, searchSvc
 }
