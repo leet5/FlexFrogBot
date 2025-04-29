@@ -6,5 +6,6 @@ import (
 )
 
 type SearchRepository interface {
-	SearchImagesByTags(ctx context.Context, tags []string) ([]*dto.ImageDTO, error)
+	SearchImagesByChatIdByTags(ctx context.Context, chatID int64, tags []string) ([]*dto.ImageDTO, error)
+	SearchChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error)
 }

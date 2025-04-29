@@ -90,3 +90,11 @@ func (svc *userService) GetUserName(update *api.Update) (string, error) {
 	}
 	return "", errors.New("username not found in update")
 }
+
+func (svc *userService) AssociateWithChat(ctx context.Context, userId int64, chatId int64) error {
+	err := svc.userRepo.AssociateWithChat(ctx, userId, chatId)
+	if err != nil {
+		return fmt.Errorf("error associating user with chat: %w", err)
+	}
+	return nil
+}

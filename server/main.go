@@ -18,6 +18,7 @@ func RunServer(ctx context.Context, searchService interfaces.SearchService) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/search", WithCORS(HandleSearch))
+	mux.HandleFunc("/api/v1/chats", WithCORS(HandleChats))
 
 	srv := &http.Server{
 		Addr:    ":8080",

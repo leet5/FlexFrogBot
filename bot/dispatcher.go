@@ -43,5 +43,16 @@ func checkNewUser(ctx context.Context, update *api.Update) {
 
 	if user == nil {
 		handlers.HandleNewUser(ctx, update, UserService, ChatService)
+	} else {
+		chatID, err := ChatService.GetChatID(update)
+		if err != nil {
+			log.Printf("[bot][check_new_user] ⚠️ Error getting chat ID: %v", err)
+			return
+		}
+		err = UserService.AssociateWithChat(ctx, userID, chatID)
+		if err != nil {
+			log.Printf("[bot][check_new_user] ⚠️ Error associating user with chat: %v", err)
+			return
+		}
 	}
 }

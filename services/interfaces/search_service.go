@@ -6,5 +6,6 @@ import (
 )
 
 type SearchService interface {
-	GetImagesByTags(ctx context.Context, tags []string) ([]*dto.ImageDTO, error)
+	GetImagesByChatIdByTags(ctx context.Context, chatID int64, tags []string) ([]*dto.ImageDTO, error)
+	GetChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error)
 }

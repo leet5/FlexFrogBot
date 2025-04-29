@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flex-frog-bot/db/repositories/interfaces"
 	"flex-frog-bot/dto"
+	"fmt"
 	"github.com/lib/pq"
 	"log"
 )
@@ -18,7 +19,7 @@ func NewSearchRepository(db *sql.DB) interfaces.SearchRepository {
 	return &searchRepository{db: db}
 }
 
-func (r *searchRepository) SearchImagesByTags(ctx context.Context, tags []string) ([]*dto.ImageDTO, error) {
+func (r *searchRepository) SearchImagesByChatIdByTags(ctx context.Context, chatID int64, tags []string) ([]*dto.ImageDTO, error) {
 	query := `
 		SELECT
 		    u.thumbnail  AS user_thumbnail,
@@ -33,7 +34,7 @@ func (r *searchRepository) SearchImagesByTags(ctx context.Context, tags []string
 		INNER JOIN chats c ON i.chat_id = c.id
 		INNER JOIN images_tags it ON i.id = it.image_id
 		INNER JOIN tags t ON it.tag_id = t.id
-		WHERE t.name = ANY ($1)
+		WHERE chat_id = $1 AND t.name = ANY ($2)
 		GROUP BY
 		    u.thumbnail,
 		    u.name,
@@ -42,11 +43,11 @@ func (r *searchRepository) SearchImagesByTags(ctx context.Context, tags []string
 		    i.thumbnail,
 		    c.name,
 		    c.thumbnail
-		HAVING array_agg(t.name) @> ARRAY[$1]
+		HAVING array_agg(t.name) @> ARRAY[$2]
 		ORDER BY i.created_at DESC
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, pq.Array(tags))
+	rows, err := r.db.QueryContext(ctx, query, chatID, pq.Array(tags))
 	if err != nil {
 		return nil, err
 	}
@@ -74,4 +75,38 @@ func (r *searchRepository) SearchImagesByTags(ctx context.Context, tags []string
 		imageDTOs = append(imageDTOs, imageDTO)
 	}
 	return imageDTOs, rows.Err()
+}
+
+func (r *searchRepository) SearchChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error) {
+	query := `
+		SELECT c.id, c.name, c.thumbnail
+		FROM chats c
+		JOIN users_chats uc ON uc.chat_id = c.id
+		WHERE uc.user_id = $1
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("query chats by user_id: %w", err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("[search_repository][SearchChatsByUserID] ⚠️ Error closing rows: %v", err)
+		}
+	}()
+
+	var chatDTOs []*dto.ChatDTO
+	for rows.Next() {
+		var chatDTO dto.ChatDTO
+		if err := rows.Scan(&chatDTO.ID, &chatDTO.Name, &chatDTO.Thumbnail); err != nil {
+			return nil, fmt.Errorf("scan chat row: %w", err)
+		}
+		chatDTOs = append(chatDTOs, &chatDTO)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
+
+	return chatDTOs, nil
 }

@@ -17,6 +17,10 @@ func NewSearchService(searchRepo interfaces.SearchRepository) interfaces2.Search
 	}
 }
 
-func (svc *searchService) GetImagesByTags(ctx context.Context, tags []string) ([]*dto.ImageDTO, error) {
-	return svc.searchRepo.SearchImagesByTags(ctx, tags)
+func (svc *searchService) GetImagesByChatIdByTags(ctx context.Context, chatID int64, tags []string) ([]*dto.ImageDTO, error) {
+	return svc.searchRepo.SearchImagesByChatIdByTags(ctx, chatID, tags)
+}
+
+func (svc *searchService) GetChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error) {
+	return svc.searchRepo.SearchChatsByUserID(ctx, userID)
 }

@@ -11,4 +11,5 @@ type UserService interface {
 	GetByID(ctx context.Context, userId int64) (*domain.User, error)
 	GetUserID(update *api.Update) (int64, error)
 	GetUserName(update *api.Update) (string, error)
+	AssociateWithChat(ctx context.Context, userId int64, chatId int64) error
 }
