@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	botName = "img_srch_bot"
+	botName = "FlexFrogBot"
 )
 
 var (

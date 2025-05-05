@@ -7,10 +7,31 @@ import (
 	"log"
 )
 
-func HandleStart(ctx context.Context, update *api.Update, chtSvc interfaces.ChatService) {
+func HandleStart(ctx context.Context, update *api.Update, chtSvc interfaces.ChatService, usrSvc interfaces.UserService) {
 	chatID, err := chtSvc.GetChatID(update)
 	if err != nil {
 		log.Printf("[bot][handle_start] ❌ Failed to extract chat ID: %v", err)
+		return
+	}
+
+	userID, err := usrSvc.GetUserID(update)
+	if err != nil {
+		log.Printf("[bot][handle_start] ❌ Failed to extract user ID: %v", err)
+		return
+	}
+
+	isAdmin, err := api.IsUserAdmin(chatID, userID)
+	if err != nil {
+		log.Printf("[bot][handle_start] ❌ Failed to check if user is admin: %v", err)
+		return
+	}
+
+	if !isAdmin {
+		log.Printf("[bot][handle_start] ❌ User is not an admin in chat %d", chatID)
+		err = api.SendTextMessage(chatID, "❌ Only admins can activate the bot.")
+		if err != nil {
+			log.Printf("[bot][handle_start] ❌ Failed to send message: %v", err)
+		}
 		return
 	}
 
