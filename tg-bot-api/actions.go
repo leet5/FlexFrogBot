@@ -63,7 +63,7 @@ func SendPayloadMessage(payload MessagePayload) error {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			log.Printf("[tg_bot_api] <UNK> Error closing body: %v", err)
+			log.Printf("[tg_bot_api] ⚠️ Error closing body: %v", err)
 		}
 	}(resp.Body)
 
@@ -138,7 +138,7 @@ func IsUserAdmin(chatID, userID int64) (bool, error) {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			log.Printf("[tg_bot_api] Failed to close response body: %v", err)
+			log.Printf("[tg_bot_api] ⚠️ Failed to close response body: %v", err)
 		}
 	}(resp.Body)
 
@@ -189,4 +189,36 @@ func GetChatProfilePhoto(saveDir, filename string, chatID int64) (string, error)
 		return "", fmt.Errorf("failed to download chat profile photo: %w", err)
 	}
 	return dest, nil
+}
+
+// IsChatPrivate checks if a chat is private (private group, private channel, or DM).
+func IsChatPrivate(chatID int64) (bool, error) {
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/getChat?chat_id=%d", token, chatID)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return false, fmt.Errorf("http.Get: %w", err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("[tg_bot_api] ⚠️ Failed to close response body: %v", err)
+		}
+	}(resp.Body)
+
+	var result struct {
+		OK     bool `json:"ok"`
+		Result Chat `json:"result"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return false, fmt.Errorf("json.Decode: %w", err)
+	}
+	if !result.OK {
+		return false, fmt.Errorf("telegram API error: %+v", result)
+	}
+
+	// If no username, it's private (private group, private channel, or DM)
+	isPrivate := result.Result.Username == ""
+	return isPrivate, nil
 }

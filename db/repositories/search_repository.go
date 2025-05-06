@@ -79,7 +79,7 @@ func (r *searchRepository) SearchImagesByChatIdByTags(ctx context.Context, chatI
 
 func (r *searchRepository) SearchChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error) {
 	query := `
-		SELECT c.id, c.name, c.thumbnail
+		SELECT c.id, c.name, c.thumbnail, c.is_private
 		FROM chats c
 		JOIN users_chats uc ON uc.chat_id = c.id
 		WHERE uc.user_id = $1
@@ -98,7 +98,7 @@ func (r *searchRepository) SearchChatsByUserID(ctx context.Context, userID strin
 	var chatDTOs []*dto.ChatDTO
 	for rows.Next() {
 		var chatDTO dto.ChatDTO
-		if err := rows.Scan(&chatDTO.ID, &chatDTO.Name, &chatDTO.Thumbnail); err != nil {
+		if err := rows.Scan(&chatDTO.ID, &chatDTO.Name, &chatDTO.Thumbnail, &chatDTO.IsPrivate); err != nil {
 			return nil, fmt.Errorf("scan chat row: %w", err)
 		}
 		chatDTOs = append(chatDTOs, &chatDTO)

@@ -88,11 +88,17 @@ func (svc *chatService) GetOrCreate(ctx context.Context, update *api.Update) (*d
 		log.Printf("[chat_service][add_if_absent] ⚠️ Error creating thumbnail: %v", err)
 	}
 
+	isPrivate, err := api.IsChatPrivate(chatID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check whether chat is private: %v", err)
+	}
+
 	chat := &domain.Chat{
 		Id:        chatID,
 		Name:      chatName,
 		Thumbnail: thumbnail,
 		Watched:   false,
+		IsPrivate: isPrivate,
 	}
 
 	err = svc.chatRepo.Create(ctx, chat)

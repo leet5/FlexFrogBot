@@ -9,6 +9,7 @@ type ChatDTO struct {
 	ID        int64  `json:"id"`
 	Name      string `json:"name"`
 	Thumbnail []byte `json:"thumbnail,omitempty"`
+	IsPrivate bool   `json:"is_private"`
 }
 
 func (dto *ChatDTO) MarshalJSON() ([]byte, error) {

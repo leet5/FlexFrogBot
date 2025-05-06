@@ -5,4 +5,5 @@ type Chat struct {
 	Name      string
 	Thumbnail []byte
 	Watched   bool
+	IsPrivate bool
 }

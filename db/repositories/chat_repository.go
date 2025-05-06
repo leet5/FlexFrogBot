@@ -21,11 +21,11 @@ func NewChatRepository(db *sql.DB) interfaces.ChatRepository {
 func (r *chatRepository) Create(ctx context.Context, chat *domain.Chat) error {
 	var id int64
 	query := `
-		INSERT INTO chats (id, name, thumbnail, watched)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO chats (id, name, thumbnail, watched, is_private)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
 	`
-	if err := r.db.QueryRowContext(ctx, query, chat.Id, chat.Name, chat.Thumbnail, chat.Watched).Scan(&id); err != nil {
+	if err := r.db.QueryRowContext(ctx, query, chat.Id, chat.Name, chat.Thumbnail, chat.Watched, chat.IsPrivate).Scan(&id); err != nil {
 		return err
 	}
 	return nil
@@ -35,11 +35,11 @@ func (r *chatRepository) Create(ctx context.Context, chat *domain.Chat) error {
 func (r *chatRepository) GetByID(ctx context.Context, chatID int64) (*domain.Chat, error) {
 	var chat domain.Chat
 	query := `
-		SELECT id, name, thumbnail, watched
+		SELECT id, name, thumbnail, watched, is_private
 		FROM chats
 		WHERE id = $1
 	`
-	err := r.db.QueryRowContext(ctx, query, chatID).Scan(&chat.Id, &chat.Name, &chat.Thumbnail, &chat.Watched)
+	err := r.db.QueryRowContext(ctx, query, chatID).Scan(&chat.Id, &chat.Name, &chat.Thumbnail, &chat.Watched, &chat.IsPrivate)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil // Chat not found
