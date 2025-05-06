@@ -6,7 +6,12 @@ import (
 )
 
 func isCommand(update *api.Update) bool {
-	return update.Message != nil && strings.HasPrefix(update.Message.Text, "/")
+	if update.Message == nil {
+		return false
+	}
+	lower := strings.ToLower(update.Message.Text)
+	suffix := strings.ToLower("@" + botName)
+	return strings.HasPrefix(lower, "/") && strings.HasSuffix(lower, suffix)
 }
 
 func isCallbackQuery(update *api.Update) bool {
