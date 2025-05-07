@@ -27,7 +27,7 @@ func (r *searchRepository) SearchImagesByChatIdByTags(ctx context.Context, chatI
 		    i.message_id AS message_id,
 		    i.created_at AS created_at,
 		    i.thumbnail  AS image_thumbnail,
-		    c.name       AS chat_name,
+		    c.title      AS chat_name,
 		    c.thumbnail  AS chat_thumbnail
 		FROM images i
 		INNER JOIN users u ON i.user_id = u.id
@@ -41,7 +41,7 @@ func (r *searchRepository) SearchImagesByChatIdByTags(ctx context.Context, chatI
 		    i.message_id,
 		    i.created_at,
 		    i.thumbnail,
-		    c.name,
+		    c.title,
 		    c.thumbnail
 		HAVING array_agg(t.name) @> ARRAY[$2]
 		ORDER BY i.created_at DESC
@@ -79,7 +79,7 @@ func (r *searchRepository) SearchImagesByChatIdByTags(ctx context.Context, chatI
 
 func (r *searchRepository) SearchChatsByUserID(ctx context.Context, userID string) ([]*dto.ChatDTO, error) {
 	query := `
-		SELECT c.id, c.name, c.thumbnail, c.is_private
+		SELECT c.id, c.title, c.username, c.thumbnail, c.is_private
 		FROM chats c
 		JOIN users_chats uc ON uc.chat_id = c.id
 		WHERE uc.user_id = $1
@@ -98,7 +98,7 @@ func (r *searchRepository) SearchChatsByUserID(ctx context.Context, userID strin
 	var chatDTOs []*dto.ChatDTO
 	for rows.Next() {
 		var chatDTO dto.ChatDTO
-		if err := rows.Scan(&chatDTO.ID, &chatDTO.Name, &chatDTO.Thumbnail, &chatDTO.IsPrivate); err != nil {
+		if err := rows.Scan(&chatDTO.ID, &chatDTO.Title, &chatDTO.Username, &chatDTO.Thumbnail, &chatDTO.IsPrivate); err != nil {
 			return nil, fmt.Errorf("scan chat row: %w", err)
 		}
 		chatDTOs = append(chatDTOs, &chatDTO)

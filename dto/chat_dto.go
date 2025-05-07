@@ -7,7 +7,8 @@ import (
 
 type ChatDTO struct {
 	ID        int64  `json:"id"`
-	Name      string `json:"name"`
+	Title     string `json:"title"`
+	Username  string `json:"username,omitempty"`
 	Thumbnail []byte `json:"thumbnail,omitempty"`
 	IsPrivate bool   `json:"is_private"`
 }

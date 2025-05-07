@@ -73,9 +73,14 @@ func (svc *chatService) GetOrCreate(ctx context.Context, update *api.Update) (*d
 		return chat, nil
 	}
 
-	chatName, err := svc.GetChatName(update)
+	chatTitle, err := svc.GetChatTitle(update)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get chat name: %v", err)
+	}
+
+	username, err := svc.GetChatUsername(update)
+	if err != nil {
+		log.Printf("[chat_service][add_if_absent] ⚠️ Error getting chat username: %v", err)
 	}
 
 	photoPath, err := api.GetChatProfilePhoto(saveDir, img_tools.GenerateUUID(), chatID)
@@ -95,7 +100,8 @@ func (svc *chatService) GetOrCreate(ctx context.Context, update *api.Update) (*d
 
 	chat := &domain.Chat{
 		Id:        chatID,
-		Name:      chatName,
+		Title:     chatTitle,
+		Username:  username,
 		Thumbnail: thumbnail,
 		Watched:   false,
 		IsPrivate: isPrivate,
@@ -103,7 +109,7 @@ func (svc *chatService) GetOrCreate(ctx context.Context, update *api.Update) (*d
 
 	err = svc.chatRepo.Create(ctx, chat)
 	if err != nil {
-		return nil, fmt.Errorf("failed to insert chat '%s' into DB: %v", chatName, err)
+		return nil, fmt.Errorf("failed to insert chat '%s' into DB: %v", chatTitle, err)
 	}
 	return chat, nil
 }
@@ -121,7 +127,7 @@ func (svc *chatService) GetChatID(update *api.Update) (int64, error) {
 	return 0, errors.New("chat ID not found in update")
 }
 
-func (svc *chatService) GetChatName(update *api.Update) (string, error) {
+func (svc *chatService) GetChatTitle(update *api.Update) (string, error) {
 	if update.Message != nil {
 		return update.Message.Chat.Title, nil
 	}
@@ -129,4 +135,14 @@ func (svc *chatService) GetChatName(update *api.Update) (string, error) {
 		return update.Callback.Message.Chat.Title, nil
 	}
 	return "", errors.New("chat name not found in update")
+}
+
+func (svc *chatService) GetChatUsername(update *api.Update) (string, error) {
+	if update.Message != nil {
+		return update.Message.Chat.Username, nil
+	}
+	if update.Callback != nil && update.Callback.Message != nil {
+		return update.Callback.Message.Chat.Username, nil
+	}
+	return "", errors.New("chat username not found in update")
 }

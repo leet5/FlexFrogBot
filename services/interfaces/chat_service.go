@@ -13,5 +13,5 @@ type ChatService interface {
 	GetByID(ctx context.Context, chatID int64) (*domain.Chat, error)
 	GetOrCreate(ctx context.Context, update *api.Update) (*domain.Chat, error)
 	GetChatID(update *api.Update) (int64, error)
-	GetChatName(update *api.Update) (string, error)
+	GetChatTitle(update *api.Update) (string, error)
 }
